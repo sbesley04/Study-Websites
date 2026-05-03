@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POLS 325 — Final Exam Study Site</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --panel: #1a2129;
+    --panel-2: #232c36;
+    --border: #2f3a47;
+    --text: #e6edf3;
+    --muted: #8b96a4;
+    --accent: #ffa657;
+    --accent-2: #79c0ff;
+    --good: #3fb950;
+    --bad: #f85149;
+    --warn: #d29922;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    line-height: 1.5;
+  }
+  header {
+    background: linear-gradient(135deg, #1a2129, #2d3848);
+    border-bottom: 2px solid var(--accent);
+    padding: 18px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 22px;
+    color: var(--accent);
+  }
+  header .sub {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  nav {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    position: sticky;
+    top: 70px;
+    z-index: 99;
+  }
+  nav button {
+    background: none;
+    color: var(--muted);
+    border: none;
+    padding: 14px 18px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: all .15s;
+  }
+  nav button:hover { color: var(--text); }
+  nav button.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 24px 80px;
+  }
+  .section { display: none; }
+  .section.active { display: block; }
+  h2 { color: var(--accent); border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-top: 0; }
+  h3 { color: var(--accent-2); margin-top: 28px; }
+  h4 { color: var(--text); margin-bottom: 6px; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+    margin: 14px 0;
+  }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+  .card-header h3 { margin: 0; }
+  .badge {
+    display: inline-block;
+    background: var(--panel-2);
+    color: var(--accent-2);
+    padding: 3px 8px;
+    font-size: 11px;
+    border-radius: 4px;
+    margin-right: 6px;
+    border: 1px solid var(--border);
+  }
+  ul { padding-left: 20px; }
+  li { margin: 6px 0; }
+  .term {
+    background: var(--panel-2);
+    border-left: 3px solid var(--accent-2);
+    padding: 10px 12px;
+    margin: 8px 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .term-name {
+    font-weight: 600;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 4px;
+  }
+  /* Flashcards */
+  .flashcard-area { display: flex; flex-direction: column; align-items: center; }
+  .flashcard {
+    width: 100%;
+    max-width: 600px;
+    min-height: 300px;
+    background: var(--panel-2);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 30px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: transform .2s;
+    user-select: none;
+  }
+  .flashcard:hover { transform: scale(1.01); }
+  .flashcard .side { font-size: 18px; text-align: center; }
+  .flashcard .side.term-side { font-size: 24px; color: var(--accent); font-weight: 600; }
+  .flashcard .hint { color: var(--muted); font-size: 12px; margin-top: 16px; }
+  .flashcard .cat { color: var(--accent-2); font-size: 12px; margin-bottom: 12px; }
+  .flashcard-controls { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .flashcard-controls button, button.btn {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  button.btn:hover, .flashcard-controls button:hover { background: var(--border); }
+  button.primary { background: var(--accent); color: #1a1a1a; border-color: var(--accent); font-weight: 600; }
+  button.primary:hover { opacity: 0.9; }
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0;
+  }
+  .filter-bar select, .filter-bar input {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+  .progress {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 8px 0;
+  }
+  /* Quiz */
+  .quiz-question { margin: 18px 0; padding: 16px; background: var(--panel-2); border-radius: 8px; }
+  .quiz-question .q-text { font-weight: 500; margin-bottom: 12px; }
+  .quiz-choices { list-style: none; padding: 0; }
+  .quiz-choices li {
+    padding: 10px 14px;
+    margin: 6px 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .1s;
+  }
+  .quiz-choices li:hover { background: var(--border); }
+  .quiz-choices li.selected { background: #2c3e50; border-color: var(--accent-2); }
+  .quiz-choices li.correct { background: #1f4d2c; border-color: var(--good); }
+  .quiz-choices li.wrong { background: #4d1f1f; border-color: var(--bad); }
+  .quiz-result {
+    background: var(--panel-2);
+    border: 2px solid var(--accent);
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+    text-align: center;
+  }
+  .quiz-result h3 { color: var(--accent); margin: 0 0 8px 0; }
+  /* Notes */
+  .notes-area textarea {
+    width: 100%;
+    min-height: 200px;
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+  }
+  .notes-area .saved-indicator {
+    color: var(--good);
+    font-size: 12px;
+    margin-top: 4px;
+    height: 16px;
+  }
+  details {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin: 8px 0;
+  }
+  details summary {
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--accent-2);
+    padding: 4px 0;
+  }
+  details[open] summary { color: var(--accent); }
+  .exam-box {
+    background: linear-gradient(135deg, #2d2418, #3d3022);
+    border: 2px solid var(--accent);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+  }
+  .exam-box h2 { color: var(--accent); margin-top: 0; border: none; }
+  .pill {
+    display: inline-block;
+    background: var(--accent);
+    color: #1a1a1a;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 6px;
+  }
+  .seed-list { background: var(--panel-2); border-radius: 6px; padding: 12px 14px 12px 28px; }
+  blockquote {
+    border-left: 3px solid var(--accent-2);
+    padding-left: 14px;
+    margin: 10px 0;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .module-meta { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+  .module-list { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); margin-bottom: 24px; }
+  .module-list a {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all .15s;
+  }
+  .module-list a:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .module-list .num {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .module-list .ttl { display: block; margin-top: 4px; font-size: 14px; }
+  .quiz-setup { background: var(--panel); border: 1px solid var(--border); padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+  .quiz-setup label { display: block; margin: 8px 0 4px; font-size: 13px; color: var(--muted); }
+  .badge-correct { background: var(--good); color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+  .badge-wrong { background: var(--bad); color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+  @media (max-width: 700px) {
+    nav { padding: 0 12px; }
+    nav button { padding: 12px 10px; font-size: 13px; }
+    main { padding: 16px 12px 60px; }
+    header { padding: 14px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>POLS 325 — East European Politics: Final Exam Study Site</h1>
+  <div class="sub">Coverage: Module 10 (Transitions) → Module 19.2 (Russia–Ukraine War) · Final: Mon May 4, 11:30am–2:00pm</div>
+</header>
+
+<nav>
+  <button data-section="overview" class="active">Overview</button>
+  <button data-section="modules">Modules</button>
+  <button data-section="readings">Readings</button>
+  <button data-section="flashcards">Flashcards</button>
+  <button data-section="quizzes">Quizzes</button>
+  <button data-section="notes">My Notes</button>
+</nav>
+
+<main>
+
+  <!-- OVERVIEW -->
+  <section id="overview" class="section active">
+    <div class="exam-box">
+      <h2>Exam Format</h2>
+      <p><strong>When:</strong> Monday, May 4, 11:30am–2:00pm, in your regular classroom</p>
+      <p><strong>Format:</strong> Closed book</p>
+      <ul>
+        <li><span class="pill">20</span> multiple-choice or fill-in-the-blank questions, worth <strong>1 point</strong> each (20 pts)</li>
+        <li><span class="pill">6</span> short answer (9 to choose from), worth <strong>2 pts</strong> each (12 pts) — describe in 1–2 sentences either a concept or a table/graph</li>
+        <li><span class="pill">3</span> paragraph questions (4 to choose from), worth <strong>10 pts</strong> each (30 pts)</li>
+      </ul>
+      <p><strong>Coverage:</strong> Module 10 "Transitions" through Module 19.2 "Russia–Ukraine war"</p>
+      <p><strong>Total:</strong> 62 points</p>
+    </div>
+
+    <h2>How to Use This Site</h2>
+    <ul>
+      <li><strong>Modules tab</strong> — Per-module overview, key terms (with definitions), and exam-prompt seeds. Use these for the short-answer section.</li>
+      <li><strong>Readings tab</strong> — Per-reading summary with main argument, key concepts, and paragraph-essay prompts. Use these for the 10-pt paragraph questions.</li>
+      <li><strong>Flashcards</strong> — Click a card to flip. Filter by module/reading. Built from every key term in the lectures + readings.</li>
+      <li><strong>Quizzes</strong> — Choose a module or "all" to randomly draw multiple-choice questions. Mimics the 20 MC/FIB section of the exam.</li>
+      <li><strong>My Notes</strong> — Free-text notes per reading and per module. Auto-saved in your browser (localStorage).</li>
+    </ul>
+
+    <h2>Modules at a Glance</h2>
+    <div class="module-list" id="overview-modules"></div>
+
+    <h2>Readings at a Glance</h2>
+    <div class="module-list" id="overview-readings"></div>
+
+    <h2>Cross-Cutting Themes for Paragraph Questions</h2>
+    <div class="card">
+      <p>The course is unified by a few big questions. If a paragraph prompt looks unfamiliar, look for these threads:</p>
+      <ul>
+        <li><strong>Why did 1989 happen the way it did, and why did the trajectories diverge?</strong> Antecedent regime type → transition mode → 1990s outcomes (Modules 10, 11, 12, 13). Pull in Kuran, Way.</li>
+        <li><strong>State-building and democratization under uncertainty.</strong> Why these specific institutions (Module 11), how the economy was rebuilt (12), how elites reshuffled (13), how voters and parties formed (14). Pull in Ágh, Lijphart, Bernhard, Deegan-Krause.</li>
+        <li><strong>Nationalism, identity, and the Yugoslav wars.</strong> Module 15. Civic vs. ethnic nationalism, Gagnon's strategic-elites thesis, role of subversive institutions and outside powers.</li>
+        <li><strong>How and why democracies decay.</strong> Modules 16, 17.1, 17.2, 17.3. Settling accounts, defining backsliding, the Hungarian Frankenstate/mafia state, bottom-up vs. top-down explanations. Pull in Scheppele, Anghel & Jones, Carothers.</li>
+        <li><strong>Europe in a dangerous world.</strong> Module 18 (EU's promise + limits as a democracy enforcer), 19.1 (NATO + Russia's revisionism), 19.2 (the war and what to do about it). Pull in Plokhy, Bond.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- MODULES -->
+  <section id="modules" class="section">
+    <h2>Module-by-Module Study Guide</h2>
+    <p class="module-meta">Click any module to expand. Use the term definitions for short-answer questions; the seeds are starting points for paragraph answers.</p>
+    <div id="modules-list"></div>
+  </section>
+
+  <!-- READINGS -->
+  <section id="readings" class="section">
+    <h2>Readings: Argument & Essay Prompts</h2>
+    <p class="module-meta">Every assigned reading from Module 10 onward, with main argument, key concepts, and prompts that mirror the short-answer + paragraph format.</p>
+    <div id="readings-list"></div>
+  </section>
+
+  <!-- FLASHCARDS -->
+  <section id="flashcards" class="section">
+    <h2>Flashcards</h2>
+    <div class="filter-bar">
+      <label>Filter:
+        <select id="fc-filter">
+          <option value="all">All cards</option>
+        </select>
+      </label>
+      <button class="btn" id="fc-shuffle">🔀 Shuffle</button>
+      <button class="btn" id="fc-reset">↺ Reset</button>
+    </div>
+    <div class="progress" id="fc-progress">Card 1 of N</div>
+    <div class="flashcard-area">
+      <div class="flashcard" id="flashcard">
+        <div class="cat" id="fc-cat"></div>
+        <div class="side term-side" id="fc-front"></div>
+        <div class="hint">Click to flip</div>
+      </div>
+      <div class="flashcard-controls">
+        <button id="fc-prev">← Previous</button>
+        <button class="primary" id="fc-flip">Flip</button>
+        <button id="fc-next">Next →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZZES -->
+  <section id="quizzes" class="section">
+    <h2>Practice Quiz (mimics MC/FIB section)</h2>
+    <div class="quiz-setup">
+      <label for="qz-source">Source:</label>
+      <select id="qz-source">
+        <option value="all">All modules (mixed)</option>
+      </select>
+      <label for="qz-num">Number of questions:</label>
+      <select id="qz-num">
+        <option value="5">5 questions (warm-up)</option>
+        <option value="10">10 questions</option>
+        <option value="20" selected>20 questions (full exam-section)</option>
+        <option value="0">All available</option>
+      </select>
+      <div style="margin-top: 14px;">
+        <button class="primary btn" id="qz-start">Start quiz</button>
+      </div>
+    </div>
+    <div id="qz-area"></div>
+  </section>
+
+  <!-- NOTES -->
+  <section id="notes" class="section">
+    <h2>My Notes</h2>
+    <p class="module-meta">Notes auto-save in your browser. They persist across visits but are local to this device. Use them to draft paragraph-question outlines for each reading.</p>
+    <div id="notes-list"></div>
+  </section>
+
+</main>
+
+<script src="data.js"></script>
+<script>
+// ========= NAVIGATION =========
+document.querySelectorAll('nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(btn.dataset.section).classList.add('active');
+    window.scrollTo(0, 0);
+  });
+});
+
+// ========= OVERVIEW LISTS =========
+const overviewMods = document.getElementById('overview-modules');
+STUDY_DATA.modules.forEach(m => {
+  const a = document.createElement('a');
+  a.href = '#';
+  a.innerHTML = `<span class="num">Module ${m.num}</span><span class="ttl">${m.title}</span>`;
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector('nav button[data-section="modules"]').click();
+    setTimeout(() => {
+      const el = document.getElementById('mod-' + m.id);
+      if (el) { el.open = true; el.scrollIntoView({behavior: 'smooth', block: 'start'}); }
+    }, 50);
+  });
+  overviewMods.appendChild(a);
+});
+
+const overviewReads = document.getElementById('overview-readings');
+STUDY_DATA.readings.forEach(r => {
+  const a = document.createElement('a');
+  a.href = '#';
+  const shortName = r.title.split('—')[0].trim();
+  const subtitle = r.title.split('—').slice(1).join('—').trim();
+  a.innerHTML = `<span class="num">${shortName}</span><span class="ttl">${subtitle}</span>`;
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector('nav button[data-section="readings"]').click();
+    setTimeout(() => {
+      const el = document.getElementById('read-' + r.id);
+      if (el) { el.open = true; el.scrollIntoView({behavior: 'smooth', block: 'start'}); }
+    }, 50);
+  });
+  overviewReads.appendChild(a);
+});
+
+// ========= MODULES =========
+const modulesList = document.getElementById('modules-list');
+STUDY_DATA.modules.forEach(m => {
+  const det = document.createElement('details');
+  det.id = 'mod-' + m.id;
+  det.innerHTML = `
+    <summary><strong>Module ${m.num}: ${m.title}</strong></summary>
+    <div style="padding-top: 12px;">
+      <div class="module-meta">
+        <strong>Readings:</strong> ${m.readings.join(' · ')}
+      </div>
+      <h4>Overview</h4>
+      <p>${m.overview}</p>
+      <h4>Key Concepts (for flashcards & short answers)</h4>
+      ${m.keyConcepts.map(c => `<div class="term"><span class="term-name">${c.term}</span>${c.def}</div>`).join('')}
+      <h4>Short-Answer Prompt Seeds (1-2 sentence answers)</h4>
+      <ol class="seed-list">${m.shortAnswerSeeds.map(s => `<li>${s}</li>`).join('')}</ol>
+      <h4>Paragraph-Question Prompt Seeds (10-pt essays)</h4>
+      <ol class="seed-list">${m.paragraphSeeds.map(s => `<li>${s}</li>`).join('')}</ol>
+      <p style="margin-top: 14px;"><a href="#" data-mod-notes="${m.id}" class="btn" style="display: inline-block; padding: 8px 14px; text-decoration: none; background: var(--panel-2); color: var(--accent-2); border: 1px solid var(--border); border-radius: 6px;">→ Open notes for this module</a></p>
+    </div>
+  `;
+  modulesList.appendChild(det);
+});
+
+// ========= READINGS =========
+const readingsList = document.getElementById('readings-list');
+STUDY_DATA.readings.forEach(r => {
+  const det = document.createElement('details');
+  det.id = 'read-' + r.id;
+  det.innerHTML = `
+    <summary><strong>${r.title}</strong></summary>
+    <div style="padding-top: 12px;">
+      <div class="module-meta">
+        ${r.modules.map(m => `<span class="badge">Module ${m}</span>`).join('')}
+      </div>
+      <h4>Main Argument</h4>
+      <p>${r.mainArgument}</p>
+      <h4>Key Concepts</h4>
+      <ul>${r.keyConcepts.map(c => `<li>${c}</li>`).join('')}</ul>
+      ${r.keyCritiques ? `<h4>Critiques (of competing approaches)</h4><ul>${r.keyCritiques.map(c => `<li>${c}</li>`).join('')}</ul>` : ''}
+      <h4>Likely Exam Questions (short-answer style)</h4>
+      <ol class="seed-list">${r.examQuestions.map(q => `<li>${q}</li>`).join('')}</ol>
+      <h4>Paragraph-Question Prompts</h4>
+      <ol class="seed-list">${r.paragraphPrompts.map(p => `<li>${p}</li>`).join('')}</ol>
+      <p style="margin-top: 14px;"><a href="#" data-read-notes="${r.id}" class="btn" style="display: inline-block; padding: 8px 14px; text-decoration: none; background: var(--panel-2); color: var(--accent-2); border: 1px solid var(--border); border-radius: 6px;">→ Open notes for this reading</a></p>
+    </div>
+  `;
+  readingsList.appendChild(det);
+});
+
+// ========= FLASHCARDS =========
+let allCards = buildFlashcards();
+let currentCards = [...allCards];
+let cardIdx = 0;
+let isFlipped = false;
+
+const fcFilter = document.getElementById('fc-filter');
+const cats = [...new Set(allCards.map(c => c.category))].sort();
+cats.forEach(c => {
+  const opt = document.createElement('option');
+  opt.value = c;
+  opt.textContent = c;
+  fcFilter.appendChild(opt);
+});
+
+function renderCard() {
+  const c = currentCards[cardIdx];
+  if (!c) return;
+  document.getElementById('fc-cat').textContent = c.category;
+  document.getElementById('fc-front').textContent = isFlipped ? c.back : c.front;
+  document.getElementById('fc-front').className = 'side ' + (isFlipped ? '' : 'term-side');
+  document.getElementById('fc-progress').textContent = `Card ${cardIdx + 1} of ${currentCards.length}`;
+}
+
+document.getElementById('flashcard').addEventListener('click', () => {
+  isFlipped = !isFlipped;
+  renderCard();
+});
+document.getElementById('fc-flip').addEventListener('click', e => {
+  e.stopPropagation();
+  isFlipped = !isFlipped;
+  renderCard();
+});
+document.getElementById('fc-next').addEventListener('click', () => {
+  cardIdx = (cardIdx + 1) % currentCards.length;
+  isFlipped = false;
+  renderCard();
+});
+document.getElementById('fc-prev').addEventListener('click', () => {
+  cardIdx = (cardIdx - 1 + currentCards.length) % currentCards.length;
+  isFlipped = false;
+  renderCard();
+});
+document.getElementById('fc-shuffle').addEventListener('click', () => {
+  currentCards.sort(() => Math.random() - 0.5);
+  cardIdx = 0;
+  isFlipped = false;
+  renderCard();
+});
+document.getElementById('fc-reset').addEventListener('click', () => {
+  fcFilter.value = 'all';
+  currentCards = [...allCards];
+  cardIdx = 0;
+  isFlipped = false;
+  renderCard();
+});
+fcFilter.addEventListener('change', () => {
+  const v = fcFilter.value;
+  currentCards = v === 'all' ? [...allCards] : allCards.filter(c => c.category === v);
+  cardIdx = 0;
+  isFlipped = false;
+  renderCard();
+});
+renderCard();
+
+// ========= QUIZZES =========
+const qzSource = document.getElementById('qz-source');
+const moduleNums = [...new Set(QUIZ_QUESTIONS.map(q => q.mod))].sort();
+moduleNums.forEach(m => {
+  const opt = document.createElement('option');
+  opt.value = m;
+  const modObj = STUDY_DATA.modules.find(mm => mm.num === m);
+  opt.textContent = `Module ${m}` + (modObj ? `: ${modObj.title}` : '');
+  qzSource.appendChild(opt);
+});
+
+let currentQuiz = [];
+let quizAnswers = {};
+let quizSubmitted = false;
+
+function startQuiz() {
+  const src = qzSource.value;
+  const n = parseInt(document.getElementById('qz-num').value);
+  let pool = src === 'all' ? [...QUIZ_QUESTIONS] : QUIZ_QUESTIONS.filter(q => q.mod === src);
+  pool.sort(() => Math.random() - 0.5);
+  currentQuiz = n === 0 ? pool : pool.slice(0, Math.min(n, pool.length));
+  quizAnswers = {};
+  quizSubmitted = false;
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const area = document.getElementById('qz-area');
+  if (!currentQuiz.length) { area.innerHTML = ''; return; }
+  let html = '';
+  currentQuiz.forEach((q, i) => {
+    html += `<div class="quiz-question" data-qi="${i}">
+      <div class="q-text"><strong>${i+1}.</strong> ${q.q} <span class="badge">Mod ${q.mod}</span></div>
+      <ul class="quiz-choices">
+        ${q.choices.map((c, ci) => {
+          let cls = '';
+          if (quizAnswers[i] === ci) cls += ' selected';
+          if (quizSubmitted) {
+            if (ci === q.a) cls = 'correct';
+            else if (quizAnswers[i] === ci) cls = 'wrong';
+          }
+          return `<li class="${cls}" data-ci="${ci}">${String.fromCharCode(65+ci)}. ${c}</li>`;
+        }).join('')}
+      </ul>
+    </div>`;
+  });
+  if (!quizSubmitted) {
+    html += `<button class="primary btn" id="qz-submit" style="margin-top: 16px;">Submit quiz</button>`;
+  } else {
+    const correct = currentQuiz.filter((q, i) => quizAnswers[i] === q.a).length;
+    const pct = Math.round(correct / currentQuiz.length * 100);
+    html = `<div class="quiz-result"><h3>Score: ${correct} / ${currentQuiz.length} (${pct}%)</h3>
+      <div>${pct >= 80 ? '🎯 Strong — you know this material.' : pct >= 60 ? '📚 Solid base, but keep reviewing.' : '⚠ Review the modules where you missed.'}</div>
+      <button class="btn" id="qz-restart" style="margin-top: 12px;">Try a new quiz</button>
+    </div>` + html;
+  }
+  area.innerHTML = html;
+
+  // Attach choice handlers
+  area.querySelectorAll('.quiz-choices li').forEach(li => {
+    li.addEventListener('click', () => {
+      if (quizSubmitted) return;
+      const qi = parseInt(li.closest('.quiz-question').dataset.qi);
+      const ci = parseInt(li.dataset.ci);
+      quizAnswers[qi] = ci;
+      renderQuiz();
+    });
+  });
+  const submitBtn = document.getElementById('qz-submit');
+  if (submitBtn) submitBtn.addEventListener('click', () => {
+    quizSubmitted = true;
+    renderQuiz();
+    window.scrollTo({top: document.getElementById('qz-area').offsetTop - 100, behavior: 'smooth'});
+  });
+  const restartBtn = document.getElementById('qz-restart');
+  if (restartBtn) restartBtn.addEventListener('click', startQuiz);
+}
+
+document.getElementById('qz-start').addEventListener('click', startQuiz);
+
+// ========= NOTES =========
+// Storage shim: handle browsers that block localStorage on file:// origin (e.g. Chrome)
+// Falls back to in-memory storage and warns the user.
+let storage;
+let storageAvailable = false;
+try {
+  localStorage.setItem('__pols325_test', '1');
+  localStorage.removeItem('__pols325_test');
+  storage = localStorage;
+  storageAvailable = true;
+} catch (e) {
+  // Fall back to a memory-only object that quacks like localStorage
+  const mem = {};
+  storage = {
+    getItem: k => mem[k] !== undefined ? mem[k] : null,
+    setItem: (k, v) => { mem[k] = v; },
+    removeItem: k => { delete mem[k]; }
+  };
+  storageAvailable = false;
+}
+
+const notesList = document.getElementById('notes-list');
+
+if (!storageAvailable) {
+  const warn = document.createElement('div');
+  warn.style.cssText = 'background: #4d3a1f; border: 1px solid var(--warn); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; color: #ffd982;';
+  warn.innerHTML = '⚠ <strong>Heads-up:</strong> Your browser blocked persistent storage for this file. Notes will only last for this session. To make notes persist, either: (1) use Firefox, or (2) serve this folder with a local server (e.g. <code>python3 -m http.server</code> in this folder, then open <code>http://localhost:8000</code>). You can also use the "Export notes" button below at any time to save them as a file.';
+  notesList.appendChild(warn);
+}
+
+// Export / import notes as JSON file (works regardless of localStorage)
+const exportBar = document.createElement('div');
+exportBar.style.cssText = 'margin-bottom: 16px; display: flex; gap: 8px; flex-wrap: wrap;';
+exportBar.innerHTML = `
+  <button class="btn" id="notes-export">⬇ Export all notes (JSON)</button>
+  <button class="btn" id="notes-import">⬆ Import notes</button>
+  <input type="file" id="notes-file" accept="application/json" style="display: none;">
+`;
+notesList.appendChild(exportBar);
+
+function buildNoteSection(id, label, kind) {
+  const sectionDiv = document.createElement('div');
+  sectionDiv.className = 'card notes-area';
+  sectionDiv.id = `notes-section-${kind}-${id}`;
+  const storageKey = `pols325-notes-${kind}-${id}`;
+  sectionDiv.innerHTML = `
+    <h3>${label}</h3>
+    <textarea id="ta-${kind}-${id}" placeholder="Draft your short-answer / paragraph notes here…"></textarea>
+    <div class="saved-indicator" id="si-${kind}-${id}"></div>
+  `;
+  notesList.appendChild(sectionDiv);
+  const ta = document.getElementById(`ta-${kind}-${id}`);
+  const si = document.getElementById(`si-${kind}-${id}`);
+  try {
+    ta.value = storage.getItem(storageKey) || '';
+  } catch (e) {
+    ta.value = '';
+  }
+  let saveTimer;
+  ta.addEventListener('input', () => {
+    clearTimeout(saveTimer);
+    si.textContent = '';
+    saveTimer = setTimeout(() => {
+      try {
+        storage.setItem(storageKey, ta.value);
+        si.textContent = storageAvailable ? '✓ Saved' : '✓ Saved (this session only)';
+      } catch (e) {
+        si.textContent = '⚠ Could not save';
+      }
+      setTimeout(() => { si.textContent = ''; }, 2000);
+    }, 400);
+  });
+}
+
+const readingsHeader = document.createElement('h3');
+readingsHeader.textContent = 'Notes per Reading';
+notesList.appendChild(readingsHeader);
+STUDY_DATA.readings.forEach(r => buildNoteSection(r.id, r.title, 'reading'));
+
+const modulesHeader = document.createElement('h3');
+modulesHeader.textContent = 'Notes per Module';
+notesList.appendChild(modulesHeader);
+STUDY_DATA.modules.forEach(m => buildNoteSection(m.id, `Module ${m.num}: ${m.title}`, 'module'));
+
+// Export / import handlers
+document.getElementById('notes-export').addEventListener('click', () => {
+  const out = {};
+  STUDY_DATA.readings.forEach(r => {
+    const k = `pols325-notes-reading-${r.id}`;
+    const v = storage.getItem(k);
+    if (v) out[k] = v;
+  });
+  STUDY_DATA.modules.forEach(m => {
+    const k = `pols325-notes-module-${m.id}`;
+    const v = storage.getItem(k);
+    if (v) out[k] = v;
+  });
+  const blob = new Blob([JSON.stringify(out, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `pols325-notes-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+document.getElementById('notes-import').addEventListener('click', () => {
+  document.getElementById('notes-file').click();
+});
+document.getElementById('notes-file').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      let count = 0;
+      Object.keys(data).forEach(k => {
+        if (k.startsWith('pols325-notes-')) {
+          storage.setItem(k, data[k]);
+          // Find the textarea and update it
+          const m = k.match(/pols325-notes-(reading|module)-(.+)/);
+          if (m) {
+            const ta = document.getElementById(`ta-${m[1]}-${m[2]}`);
+            if (ta) ta.value = data[k];
+            count++;
+          }
+        }
+      });
+      alert(`Imported ${count} note sections.`);
+    } catch (err) {
+      alert('Could not parse file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+});
+
+// Notes deep-links from module/reading pages
+document.querySelectorAll('[data-mod-notes]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector('nav button[data-section="notes"]').click();
+    setTimeout(() => {
+      const el = document.getElementById(`notes-section-module-${a.dataset.modNotes}`);
+      if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }, 50);
+  });
+});
+document.querySelectorAll('[data-read-notes]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector('nav button[data-section="notes"]').click();
+    setTimeout(() => {
+      const el = document.getElementById(`notes-section-reading-${a.dataset.readNotes}`);
+      if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }, 50);
+  });
+});
+</script>
+</body>
+</html>
